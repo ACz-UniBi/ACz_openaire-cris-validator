@@ -141,7 +141,7 @@ public class CRISValidator {
 	 * The connection stream factory to use for getting the response stream from a connection.
 	 */
 	public static final ConnectionStreamFactory CONN_STREAM_FACTORY = new FileLoggingConnectionStreamFactory( "data" );
-	
+
 	/**
 	 * The main method: used for running the JUnit4 test suite from the command line.
 	 * The first command line argument should be the URL of the endpoint to test.
@@ -171,7 +171,7 @@ public class CRISValidator {
 				throw new MissingArgumentException( "Please specify the OAI-PMH endpoint URL as the value of the " + endpointPropertyKey + " system property or as the first argument on the command line" );
 			}
 			final URL endpointBaseUrl = new URL( endpointUrl );
-			endpoint = new OAIPMHEndpoint( endpointBaseUrl, getParserSchema(), CONN_STREAM_FACTORY );			
+			endpoint = new OAIPMHEndpoint( endpointBaseUrl, getParserSchema(), CONN_STREAM_FACTORY );
 		}
 	}
 	
@@ -659,7 +659,6 @@ public class CRISValidator {
 			fail( "While validating element " + elString + ": " + e );
 		}
 	}
-	
 }
 
 /**
@@ -684,6 +683,7 @@ class FileLoggingConnectionStreamFactory implements OAIPMHEndpoint.ConnectionStr
 	@Override
 	public InputStream makeInputStream( final URLConnection conn ) throws IOException {
 		InputStream inputStream = conn.getInputStream();
+		String baseURLhostname = conn.getURL().getHost();
 		if ( logDir != null ) {
 			final Path logDirPath = Paths.get( logDir );
 			Files.createDirectories( logDirPath );
@@ -699,10 +699,9 @@ class FileLoggingConnectionStreamFactory implements OAIPMHEndpoint.ConnectionStr
  				sb.append( m2.group( 1 ) );
  			}
 			final DateTimeFormatter dtf = DateTimeFormatter.ofPattern( "yyyyMMdd'T'HHmmss.SSS" );
-			final String logFilename = "oai-pmh--" + dtf.format( LocalDateTime.now() ) + "--" + sb.toString() + ".xml";
+			final String logFilename = baseURLhostname + "_oai-pmh--" + dtf.format( LocalDateTime.now() ) + "--" + sb.toString() + ".xml";
 			inputStream = new FileSavingInputStream( inputStream, logDirPath.resolve( logFilename ) );
 		}
 		return inputStream;
 	}
-	
 }
