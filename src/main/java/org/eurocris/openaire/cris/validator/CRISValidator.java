@@ -74,7 +74,10 @@ import org.xml.sax.SAXParseException;
  */
 @FixMethodOrder( value=MethodSorters.NAME_ASCENDING )
 public class CRISValidator {
-	
+	/**
+	 * used to calculate MEGABYTES from BYTES
+	 */
+	private static final long MEGABYTE = 1024L * 1024L;
 	/**
 	 * The spec of the set of equipments.
 	 */
@@ -173,6 +176,7 @@ public class CRISValidator {
 			final URL endpointBaseUrl = new URL( endpointUrl );
 			endpoint = new OAIPMHEndpoint( endpointBaseUrl, getParserSchema(), CONN_STREAM_FACTORY );
 		}
+		memoryConsumption();
 	}
 	
 	/**
@@ -658,6 +662,31 @@ public class CRISValidator {
 		} catch ( final SAXException | IOException e ) {
 			fail( "While validating element " + elString + ": " + e );
 		}
+	}
+
+	/**
+	 * calculate bytes to megabytes
+	 *
+	 * @param bytes
+	 * @return
+	 */
+	public static long bytesToMegabytes(long bytes) {
+		return bytes / MEGABYTE;
+	}
+
+	/**
+	 * calculate memory consumption
+	 */
+	public void memoryConsumption() {
+		// Get the Java runtime
+		Runtime runtime = Runtime.getRuntime();
+		// Run the garbage collector
+		runtime.gc();
+		// Calculate the used memory
+		long memory = runtime.totalMemory() - runtime.freeMemory();
+		System.out.println("Used memory is bytes: " + memory);
+		System.out.println("Used memory is megabytes: "
+				+ bytesToMegabytes(memory)+"\n## ##\n\n");
 	}
 }
 
